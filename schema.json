@@ -1,0 +1,605 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "豆瓣电影",
+  "description": "豆瓣电影信息",
+  "type": "object",
+  "definitions": {
+    "actor": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/role"
+          }
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "author": {
+          "type": "null"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "cover_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "avatar": {
+          "type": "object",
+          "properties": {
+            "large": {
+              "type": "string",
+              "format": "uri"
+            },
+            "small": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "sharing_url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "cover": {
+      "type": "object",
+      "definitions": {
+        "image": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string"
+            },
+            "width": {
+              "type": "integer"
+            },
+            "height": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "properties": {
+        "liked": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "author": {
+          "$ref": "#/definitions/user"
+        },
+        "likers_count": {
+          "type": "integer"
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "large": {
+              "$ref": "#/definitions/cover/definitions/image"
+            },
+            "small": {
+              "$ref": "#/definitions/cover/definitions/image"
+            },
+            "normal": {
+              "$ref": "#/definitions/cover/definitions/image"
+            }
+          }
+        },
+        "uri": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string"
+        },
+        "comments_count": {
+          "type": "integer"
+        },
+        "allow_comment": {
+          "type": "boolean"
+        },
+        "position": {
+          "type": "number"
+        },
+        "owner_uri": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "sharing_url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "director": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/role"
+          }
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "author": {
+          "type": "null"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "cover_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "avatar": {
+          "type": "object",
+          "properties": {
+            "large": {
+              "type": "string",
+              "format": "uri"
+            },
+            "small": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "sharing_url": {
+          "type": "string"
+        }
+      }
+    },
+    "rating": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "star_count": {
+          "type": "number"
+        },
+        "value": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "count",
+        "max",
+        "star_count",
+        "value"
+      ]
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "编剧",
+        "导演",
+        "演员",
+        "配音",
+        "制片",
+        "剪辑",
+        "副导演",
+        "摄影",
+        "作曲",
+        "服装设计",
+        "艺术指导",
+        "选角导演",
+        "美术设计",
+        "视觉特效",
+        "动作指导",
+        "布景师",
+        "化妆师"
+      ]
+    },
+    "tag": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "is_channel": {
+          "type": "boolean"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "trailer": {
+      "type": "object",
+      "properties": {
+        "sharing_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "video_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "title": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        },
+        "cover_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "term_num": {
+          "type": "integer"
+        },
+        "n_comments": {
+          "type": "integer"
+        },
+        "create_time": {
+          "type": "string"
+        },
+        "subject_title": {
+          "type": "string"
+        },
+        "runtime": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "desc": {
+          "type": "string"
+        }
+      }
+    },
+    "user": {
+      "type": "object",
+      "properties": {
+        "loc": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "uid": {
+                  "type": "string"
+                }
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "我也不知道这个字段是做什么用的"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "avator": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "uid": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id", "name", "uid"
+      ]
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^\\d+$",
+      "description": "条目 ID"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "中文名"
+    },
+    "original_title": {
+      "type": "string",
+      "description": "原名"
+    },
+    "aka": {
+      "type":"array",
+      "items": {
+        "type": "string"
+      },
+      "description": "又名"
+    },
+    "rating": {
+      "$ref": "#/definitions/rating",
+      "description": "评分"
+    },
+    "intro": {
+      "type": "string",
+      "description": "电影剧情简介"
+    },
+    "trailer": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/trailer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "预告片信息"
+    },
+    "year": {
+      "type": "string",
+      "pattern": "(?:^\\d{4}$)?",
+      "description": "年份"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "语言"
+    },
+    "genres": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "影片类型，最多提供3个"
+    },
+    "review_count": {
+      "type": "number",
+      "description": "电影评论数量"
+    },
+    "countries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "制片国家/地区"
+    },
+    "cover": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/cover"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "durations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "片长"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/tag"
+      },
+      "description": "标签"
+    },
+    "pubdate": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "如果条目类型是电影则为上映日期，如果是电视剧则为首映日期"
+    },
+    "is_released": {
+      "type": "boolean",
+      "description": "是否发布"
+    },
+    "release_date": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "发布日期"
+    },
+    "actors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/actor"
+      }
+    },
+    "directors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/director"
+      }
+    },
+
+    "null_rating_reason": {
+      "type": "string"
+    },
+    "in_blacklist": {
+      "type": "boolean"
+    },
+    "is_douban_intro": {
+      "type": "boolean"
+    },
+    "subtype": {
+      "type": "string"
+    },
+    "webisode_count": {
+      "type": "integer"
+    },
+    "honor_infos": {
+      "type": "array"
+    },
+    "line_watches": {
+      "type": "array"
+    },
+    "can_interact": {
+      "type": "boolean"
+    },
+    "vendor_count": {
+      "type": "integer"
+    },
+    "lineticket_url": {
+      "type": "string"
+    },
+    "body_bg_color": {
+      "type": "string",
+      "pattern": "^[\\dA-Za-z]{6}$"
+    },
+    "head_info": {
+      "type": "null"
+    },
+    "forum_info": {
+      "type": "null"
+    },
+    "webisode": {
+      "type": "null"
+    },
+    "has_linewatch": {
+      "type": "boolean"
+    },
+    "webview_info": {
+      "type": "object"
+    },
+    "interest": {
+      "type": "null"
+    },
+
+    "comment_count": {
+      "type": "integer"
+    },
+    "card_subtitle": {
+      "type": "string",
+      "description": "微信小程序中卡片的副标题，由上映年份、演员、题材、导演等信息提炼而成"
+    },
+    "vendor_icons": {
+      "type": "array"
+    },
+    "is_tv": {
+      "type": "boolean",
+      "description": "是否为电视节目"
+    },
+    "video": {},
+    "uri": {
+      "type": "string"
+    },
+    "sharing_url": {
+      "type": "string",
+      "description": "在 app 中被分享时使用的地址"
+    },
+    "episodes_count": {
+      "type": "integer",
+      "description": "当前季的集数(tv only)"
+    },
+    "last_episode_number": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "pic": {
+      "type": "object",
+      "properties": {
+        "large": {
+          "type": "string",
+          "format": "uri"
+        },
+        "small": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "ticket_price_info": {
+      "type": "string"
+    }
+  },
+  "required":[
+    "id", "title"
+  ]
+}
