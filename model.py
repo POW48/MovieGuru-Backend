@@ -180,6 +180,11 @@ def import_douban_dataset(schema_path, dataset_path):
             tags=[get_tag(tag['name']) for tag in data['tags']],
             aliases=[Alias(movie_id=data['id'], alias=alias) for alias in data['aka']])
         session.add(mov)
+
+    # add staffs to session
+    for staff_id, staff_entity in staffs_cache.items():
+        session.add(staff_entity)
+
     session.commit()
 
 
