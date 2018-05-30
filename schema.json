@@ -312,6 +312,12 @@
         }
       }
     },
+    "type": {
+      "type": "string",
+      "enum": [
+        "movie", "tv"
+      ]
+    },
     "user": {
       "type": "object",
       "properties": {
@@ -507,7 +513,7 @@
       "type": "boolean"
     },
     "subtype": {
-      "type": "string"
+      "$ref": "#/definitions/type"
     },
     "webisode_count": {
       "type": "integer"
@@ -532,13 +538,100 @@
       "pattern": "^[\\dA-Za-z]{6}$"
     },
     "head_info": {
-      "type": "null"
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "uri"
+            },
+            "title": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "forum_info": {
-      "type": "null"
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "uri"
+            },
+            "id": {
+              "type": "string"
+            },
+            "participant_count": {
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "webisode": {
-      "type": "null"
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "sharing_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "video_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "title": {
+              "type": "string"
+            },
+            "uri": {
+              "type": "string",
+              "format": "uri"
+            },
+            "cover_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "term_num": {
+              "type": "integer"
+            },
+            "n_comments": {
+              "type": "integer"
+            },
+            "create_time": {
+              "type": "string"
+            },
+            "subject_title": {
+              "type": "string"
+            },
+            "runtime": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "desc": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "has_linewatch": {
       "type": "boolean"
