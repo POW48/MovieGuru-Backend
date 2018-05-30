@@ -40,6 +40,7 @@ class DoubanImporter:
     def _validate_json(self, movie_json):
         self.validator.validate(movie_json)
 
+        # remove deplicated items in actor list
         deduplicator = set()
         new_actors_list = []
         for staff_json in movie_json['actors']:
@@ -49,9 +50,20 @@ class DoubanImporter:
             new_actors_list.append(staff_json)
         movie_json['actors'] = new_actors_list
 
+        # remove duplicated items in genre names
+        new_genre_list = []
+        for genre_name in movie_json['genres']:
+            if genre_name not in new_genre_list:
+                new_genre_list.append(genre_name)
+        movie_json['genres'] = new_genre_list
+
     def import_file(self, json_path):
         data = json.load(open(json_path, 'r'))
-        self._validate_json(data)
+
+        try:
+            self._validate_json(data)
+        except:
+            return
 
         for staff_json in data['actors']:
             staff_entity = self.get_or_create_staff(staff_json)
