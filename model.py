@@ -187,9 +187,8 @@ def import_douban_dataset(schema_path, dataset_path):
 
     session.commit()
 
+engine = create_engine('sqlite:///:memory:', echo=True)
+Session.configure(bind=engine)
+Base.metadata.create_all(engine)
 
-if __name__ == '__main__':
-    engine = create_engine('sqlite:///:memory:', echo=True)
-    Session.configure(bind=engine)
-    Base.metadata.create_all(engine)
-    import_douban_dataset('schema.json', '../Douban/data')
+__all__ = ['Session', 'Movie', 'Staff', 'Alias', 'Tag', 'Genre', 'MovieStaff']
