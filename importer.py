@@ -3,6 +3,7 @@ import os
 import os.path
 
 import jsonschema
+from progressbar import ProgressBar
 
 from model import Alias, Genre, Movie, MovieStaff, Session, Staff, Tag
 
@@ -87,8 +88,12 @@ class DoubanImporter:
         self.session.add(mov)
 
     def import_folder(self, dataset_dir):
-        for json_path in [os.path.join(dataset_dir, name) for name in os.listdir(dataset_dir) if name.endswith('.json')]:
+        file_list = [os.path.join(dataset_dir, name) for name in os.listdir(dataset_dir) if name.endswith('.json')]
+        progress_bar = ProgressBar(max_value=len(file_list))
+        for json_path in file_list:
             self.import_file(json_path)
+            progress_bar.update(progress_bar.value + 1)
+        progress_bar.finish()
 
     def commit(self):
         self.session.commit()
