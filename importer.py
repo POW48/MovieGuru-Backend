@@ -1,8 +1,10 @@
 import json
-import jsonschema
 import os
 import os.path
-from model import Session, Movie, MovieStaff, Alias, Staff, Genre, Tag
+
+import jsonschema
+
+from model import Alias, Genre, Movie, MovieStaff, Session, Staff, Tag
 
 
 class DoubanImporter:
@@ -68,14 +70,17 @@ class DoubanImporter:
         for staff_json in data['actors']:
             staff_entity = self.get_or_create_staff(staff_json)
             # Add record in movie_staffs
-            self.session.add(MovieStaff(movie_id=data['id'], staff_id=staff_json['id'], type=0)) # TODO: specify role he
+            # TODO: specify role he
+            self.session.add(MovieStaff(
+                movie_id=data['id'], staff_id=staff_json['id'], type=0))
 
         mov = Movie(
             id=data['id'],
             title=data['title'],
             rating=float(data['rating']['value']),
             original_title='',
-            genres=[self.get_or_create_genre(genre) for genre in data['genres']],
+            genres=[self.get_or_create_genre(genre)
+                    for genre in data['genres']],
             tags=[self.get_or_create_tag(tag['name']) for tag in data['tags']],
             aliases=[Alias(movie_id=data['id'], alias=alias) for alias in data['aka']])
 

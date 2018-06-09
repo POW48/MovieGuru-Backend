@@ -1,17 +1,19 @@
 import json
 import os
-import jieba
-from sklearn import feature_extraction
-from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.feature_extraction.text import CountVectorizer
+
 import numpy as np
+
+import jieba
 import progressbar
+from sklearn import feature_extraction
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 
 movieset = dict()
 
 
 def get_stopwordslist(filepath):
-    stopwords = [line.strip() for line in open(filepath, 'r', encoding='utf-8').readlines()]
+    stopwords = [line.strip() for line in open(
+        filepath, 'r', encoding='utf-8').readlines()]
     return stopwords
 
 #
@@ -31,6 +33,8 @@ def get_stopwordslist(filepath):
 #     pass
 #
 #
+
+
 def getlistdir(name):
     a = []
     for i in os.listdir(name):
@@ -46,14 +50,14 @@ def gettfidf():
     count = 0
     for movie in moivelist:
         count = count+1
-        with open('douban/'+movie,'r') as f:
-            this_or_moive =json.load(f)
+        with open('douban/'+movie, 'r') as f:
+            this_or_moive = json.load(f)
             the = dict()
             the['title'] = this_or_moive['title']
             actors = []
             for act in this_or_moive['actors']:
                 actors.append(act['name'])
-            the['actors']= actors
+            the['actors'] = actors
             directors = []
 
             for director in this_or_moive['directors']:
@@ -75,24 +79,25 @@ def gettfidf():
         # if count==100:
         #     break
 
-    json.dump(movieset,open('movieset','w',encoding='utf8'))
+    json.dump(movieset, open('movieset', 'w', encoding='utf8'))
 
     stopwordslist = get_stopwordslist('chinese_stopword.txt')
     moive_corpus = []
     name_act_corpus = []
     for i in movieset:
-        temp = jieba.cut(movieset[i]['intro'],cut_all=all)
+        temp = jieba.cut(movieset[i]['intro'], cut_all=all)
         a = []
         for word in temp:
             # if word not in stopwordslist:
             a.append(word)
         a = ' '.join(a)
-        b = movieset[i]['actors']+movieset[i]['directors']+movieset[i]['tags']+movieset[i]['aka'] +movieset[i]['genres']
+        b = movieset[i]['actors']+movieset[i]['directors'] + \
+            movieset[i]['tags']+movieset[i]['aka'] + movieset[i]['genres']
         b.append(movieset[i]['title'])
 
         b = ' '.join(b)
         allnameset = b
-        b = jieba.cut(b,cut_all=True)
+        b = jieba.cut(b, cut_all=True)
         b = ' '.join(b)
         b = b+' '+allnameset
         # print(a)
@@ -101,13 +106,13 @@ def gettfidf():
         moive_corpus.append(a)
         name_act_corpus.append(b)
 
-    vectorizer = CountVectorizer()  # 该类会将文本中的词语转换为词频矩阵，矩阵元素a[i][j] 表示j词在i类文本下的词频
+    # 该类会将文本中的词语转换为词频矩阵，矩阵元素a[i][j] 表示j词在i类文本下的词频
+    vectorizer = CountVectorizer()
     transformer = TfidfTransformer()  # 该类会统计每个词语的tf-idf权值
     tfidf = transformer.fit_transform(
-    vectorizer.fit_transform(moive_corpus))  # 第一个fit_transform是计算tf-idf，第二个fit_transform是将文本转为词频矩阵
+        vectorizer.fit_transform(moive_corpus))  # 第一个fit_transform是计算tf-idf，第二个fit_transform是将文本转为词频矩阵
     intro_word = vectorizer.get_feature_names()  # 获取词袋模型中的所有词语
     # weight = tfidf.toarray()  # 将tf-idf矩阵抽取出来，元素a[i][j]表示j词在i类文本中的tf-idf权重
-
 
     # print(tfidf.shape[1])
     # c = tfidf[3].toarray()
@@ -118,10 +123,11 @@ def gettfidf():
     # #         print(type(j))
     # print(len(intro_word))
 
-    vectorizer2 = CountVectorizer()  # 该类会将文本中的词语转换为词频矩阵，矩阵元素a[i][j] 表示j词在i类文本下的词频
+    # 该类会将文本中的词语转换为词频矩阵，矩阵元素a[i][j] 表示j词在i类文本下的词频
+    vectorizer2 = CountVectorizer()
     transformer2 = TfidfTransformer()  # 该类会统计每个词语的tf-idf权值
     tfidf2 = transformer.fit_transform(
-    vectorizer2.fit_transform(name_act_corpus))  # 第一个fit_transform是计算tf-idf，第二个fit_transform是将文本转为词频矩阵
+        vectorizer2.fit_transform(name_act_corpus))  # 第一个fit_transform是计算tf-idf，第二个fit_transform是将文本转为词频矩阵
     title_word = vectorizer.get_feature_names()  # 获取词袋模型中的所有词语
     # weight2 = tfidf.toarray()  # 将tf-idf矩阵抽取出来，元素a[i][j]表示j词在i类文本中的tf-idf权重
     # for i in range(len(weight)):#打印每类文本的tf-idf词语权重，第一个for遍历所有文本，第二个for便利某一类文本下的词语权重
@@ -136,25 +142,20 @@ def gettfidf():
         weight = tfidf[a].toarray()
         for j in range(len(intro_word)):
 
-            if weight[0][j]!=0:
+            if weight[0][j] != 0:
                 tfidfidct[intro_word[j]] = weight[0][j]
                 # print(word[j])
         movieset[i]['tfidf'] = tfidfidct
-        a +=1
+        a += 1
 
     # for i in movieset:
     #     print(movieset[i]['intro'])
     #     print(movieset[i]['tfidf'])
 
-
-    #name 0.25 director 0.2 actors 0.15 tfidf 0.15*tfidf
-
+    # name 0.25 director 0.2 actors 0.15 tfidf 0.15*tfidf
 
     rank_dict = dict()
     all_word = intro_word+title_word
-
-
-
 
     for i in movieset:
         movie = movieset[i]
@@ -178,7 +179,7 @@ def gettfidf():
         bar.update(a)
         a = a+1
         rank_dict[word] = dict()
-        #title aka tags genres actors directors tf-idf
+        # title aka tags genres actors directors tf-idf
 
         for movie in movieset:
             count = 0
@@ -188,9 +189,9 @@ def gettfidf():
             movie = movieset[movie]
 
             if word in movie['title']:
-                count +=0.25
+                count += 0.25
                 flags[flagscount] = 1
-            flagscount +=1
+            flagscount += 1
 
             for aka in movie['aka']:
                 if word in aka:
@@ -215,7 +216,7 @@ def gettfidf():
             flagscount += 1
             for actor in movie['actors']:
                 if word in actor:
-                    count +=0.2
+                    count += 0.2
                     flags[flagscount] = 1
 
                     break
@@ -230,26 +231,27 @@ def gettfidf():
 
             flagscount += 1
             if word in movie['tfidf']:
-                count +=movie['tfidf'][word]*0.15
+                count += movie['tfidf'][word]*0.15
                 flags[flagscount] = 1
 
             flagscount += 1
 
             # thismoivecount = dict()
             # thismoivecount[movie]  = count
-            if count!=0:
+            if count != 0:
                 try:
                     temp = []
                     temp.append(count)
                     temp.append(flags)
-                    rank_dict[word][movieid]=temp
+                    rank_dict[word][movieid] = temp
                 except:
                     print('wrong')
 
-        rank_dict[word] = sorted(rank_dict[word].items(), key=lambda x: x[1], reverse=True)
+        rank_dict[word] = sorted(
+            rank_dict[word].items(), key=lambda x: x[1], reverse=True)
 
     bar.finish()
-    json.dump(rank_dict,open('rankdict','w',encoding='utf8'))
+    json.dump(rank_dict, open('rankdict', 'w', encoding='utf8'))
 
 
 if __name__ == '__main__':

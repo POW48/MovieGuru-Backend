@@ -1,5 +1,6 @@
+from sqlalchemy import (Column, ForeignKey, Integer, Numeric, String, Table,
+                        create_engine)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine, Table, Column, Integer, String, Numeric, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker
 
 """
@@ -65,6 +66,8 @@ STAFF_NAME_LENGTH = 100
 """
 Association table for movies and tags
 """
+
+
 class MovieStaff(Base):
     __tablename__ = 'movie_staffs'
     movie_id = Column(ForeignKey('movies.id'), primary_key=True)
@@ -106,11 +109,11 @@ class Movie(Base):
     original_title = Column(String(MOVIE_TITLE_LENGTH), nullable=False)
     rating = Column(Numeric(1, 1))
 
-    genres = relationship('Genre', secondary=movie_genres, back_populates='movies')
+    genres = relationship('Genre', secondary=movie_genres,
+                          back_populates='movies')
     tags = relationship('Tag', secondary=movie_tags, back_populates='movies')
     staffs = relationship('MovieStaff', back_populates='movie')
     aliases = relationship('Alias', back_populates='movie')
-
 
     def __repr__(self):
         return '<Movie(title="%s", original_title="%s")>' % (self.title, self.original_title)
