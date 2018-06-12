@@ -2,8 +2,16 @@ import json
 
 import tornado.ioloop
 import tornado.web
+import jieba
 
 from model import Movie, Session, Staff
+
+
+# jieba use lazy-load by default, force loading vocabulary
+jieba.initialize()
+
+
+rank_dict = json.load(open('../rank_dict.json'))
 
 
 class JsonRequestHandler(tornado.web.RequestHandler):
@@ -16,14 +24,30 @@ class JsonRequestHandler(tornado.web.RequestHandler):
 
 class SearchHandler(JsonRequestHandler):
     def get(self):
-        query = self.get_query_argument('q')
+        global rank_dict
+
+        query_text = self.get_query_argument('q')
         offset = self.get_query_argument('offset', default=0)
         limit = self.get_query_argument('limit', default=0)
-        self.write_json({
-            'query': query,
-            'offset': offset,
-            'limit': limit
-        })
+        query_words = jieba.cut(query_text, cut_all=True)
+        movie_set = dict()
+        for word in query_words:
+            if word in rank_dict:
+                for movie_id, score in rank_dict[word][:10]:
+                    if movie_id in movie_set:
+                        movie_set[movie_id] += score[0]
+                    else:
+                        movie_set[movie_id] = score[0]
+
+        search_result = []
+        for movie_id in movie_set:
+            search_result.append({ 'id': movie_id, 'score': movie_set[movie_id] })
+        search_result.sort(key=lambda x: x['score'], reverse=True)
+
+        if limit > 0:
+            search_result = search_result[:limit]
+        
+        self.write_json(search_result)
         self.finish()
 
 
