@@ -35,7 +35,10 @@ class DoubanImporter:
         staff_id = staff_json['id']
         if staff_id in self.staffs_cache:
             return self.staffs_cache[staff_id]
-        staff_entity = Staff(id=staff_id, name=staff_json['name'])
+        staff_entity = Staff(id=staff_id,
+                             name=staff_json['name'],
+                             abstract=staff_json['abstract'],
+                             portrait=staff_json['avatar']['large'])
         self.session.add(staff_entity)
         self.staffs_cache[staff_id] = staff_entity
         return staff_entity
@@ -43,15 +46,18 @@ class DoubanImporter:
     def _validate_json(self, movie_json):
         self.validator.validate(movie_json)
 
-        # remove deplicated items in actor list
+        # merge actors and directors
+        staffs = movie_json['actors'] + movie_json['directors']
+
+        # remove deplicated items in staff list
         deduplicator = set()
-        new_actors_list = []
-        for staff_json in movie_json['actors']:
+        new_staffs_list = []
+        for staff_json in staffs:
             if staff_json['id'] in deduplicator:
                 continue
             deduplicator.add(staff_json['id'])
-            new_actors_list.append(staff_json)
-        movie_json['actors'] = new_actors_list
+            new_staffs_list.append(staff_json)
+        movie_json['staffs'] = new_staffs_list
 
         # remove duplicated items in genre names
         new_genre_list = []
@@ -59,6 +65,13 @@ class DoubanImporter:
             if genre_name not in new_genre_list:
                 new_genre_list.append(genre_name)
         movie_json['genres'] = new_genre_list
+
+        # remove duplicated items in aliases
+        new_aka_list = []
+        for aka in movie_json['aka']:
+            if aka not in new_aka_list:
+                new_aka_list.append(aka)
+        movie_json['aka'] = new_aka_list
 
     def import_file(self, json_path):
         data = json.load(open(json_path, 'r'))
@@ -68,27 +81,40 @@ class DoubanImporter:
         except:
             return
 
-        for staff_json in data['actors']:
+        for staff_json in data['staffs']:
             staff_entity = self.get_or_create_staff(staff_json)
             # Add record in movie_staffs
-            # TODO: specify role he
-            self.session.add(MovieStaff(
-                movie_id=data['id'], staff_id=staff_json['id'], type=0))
+            self.session.add(MovieStaff(movie_id=data['id'],
+                                        staff_id=staff_json['id'],
+                                        type=MovieStaff.get_type_by_roles(staff_json['roles'])))
 
-        mov = Movie(
-            id=data['id'],
-            title=data['title'],
-            rating=float(data['rating']['value']),
-            original_title='',
-            genres=[self.get_or_create_genre(genre)
-                    for genre in data['genres']],
-            tags=[self.get_or_create_tag(tag['name']) for tag in data['tags']],
-            aliases=[Alias(movie_id=data['id'], alias=alias) for alias in data['aka']])
+        mov = Movie(id=data['id'],
+                    title=data['title'],
+                    original_title=data['original_title'],
+                    rating=float(data['rating']['value']),
+                    introduction=data['intro'],
+                    poster=data['pic']['large'],
+                    year=(int(data['year']) if data['year'].isdigit() else None),
+                    languages=','.join(data['languages']),
+                    countries=','.join(data['countries']),
+                    publish_dates=','.join(data['pubdate']),
+                    review_count=int(data['review_count']),
+                    durations=','.join(data['durations']),
+                    is_tv=data['is_tv'],
+                    # association with other entities
+                    genres=[self.get_or_create_genre(genre)
+                            for genre in data['genres']],
+                    tags=[self.get_or_create_tag(tag['name'])
+                          for tag in data['tags']],
+                    aliases=[Alias(movie_id=data['id'], alias=alias)
+                             for alias in data['aka']])
 
         self.session.add(mov)
 
     def import_folder(self, dataset_dir):
-        file_list = [os.path.join(dataset_dir, name) for name in os.listdir(dataset_dir) if name.endswith('.json')]
+        file_list = [os.path.join(dataset_dir, name)
+                     for name in os.listdir(dataset_dir)
+                     if name.endswith('.json')]
         progress_bar = ProgressBar(max_value=len(file_list))
         for json_path in file_list:
             self.import_file(json_path)
